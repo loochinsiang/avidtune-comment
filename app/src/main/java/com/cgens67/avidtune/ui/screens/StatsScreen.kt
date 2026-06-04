@@ -448,47 +448,47 @@ fun StatsScreen(
                     )
                 }
             },
-//            actions = {
-//                IconButton(
-//                    onClick = { showInsightBottomSheet = true },
-//                    modifier = Modifier.size(48.dp),
-//                    enabled = true,
-//                    onLongClick = {}
-//                ) {
-//                    Icon(
-//                        painter = painterResource(R.drawable.auto_awesome),
-//                        contentDescription = "AvidTune Insight",
-//                        tint = Color(0xFF1DB954)
-//                    )
-//                }
-//            }
+            actions = {
+                IconButton(
+                    onClick = { showInsightBottomSheet = true },
+                    modifier = Modifier.size(48.dp),
+                    enabled = true,
+                    onLongClick = {}
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.auto_awesome),
+                        contentDescription = stringResource(R.string.avidtune_insight),
+                        tint = Color(0xFF1DB954)
+                    )
+                }
+            }
 
         )
     }
 
-//    // BottomSheet de Insight
-//    if (showInsightBottomSheet) {
-//        ModalBottomSheet(
-//            onDismissRequest = { showInsightBottomSheet = false },
-//            sheetState = sheetState
-//        ) {
-//            InsightBottomSheetContent(
-//                onNavigateToFullInsight = {
-//                    coroutineScope.launch {
-//                        sheetState.hide()
-//                        showInsightBottomSheet = false
-//                    }
-//                    navController.navigate("insight")
-//                },
-//                onDismiss = {
-//                    coroutineScope.launch {
-//                        sheetState.hide()
-//                        showInsightBottomSheet = false
-//                    }
-//                }
-//            )
-//        }
-//    }
+    // BottomSheet de Insight
+    if (showInsightBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showInsightBottomSheet = false },
+            sheetState = sheetState
+        ) {
+            InsightBottomSheetContent(
+                onNavigateToFullInsight = {
+                    coroutineScope.launch {
+                        sheetState.hide()
+                        showInsightBottomSheet = false
+                    }
+                    navController.navigate("insight")
+                },
+                onDismiss = {
+                    coroutineScope.launch {
+                        sheetState.hide()
+                        showInsightBottomSheet = false
+                    }
+                }
+            )
+        }
+    }
 }
 
 @Composable
@@ -516,7 +516,7 @@ fun InsightBottomSheetContent(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                painter = painterResource(R.drawable.auto_awesome), // o bar_chart
+                painter = painterResource(R.drawable.auto_awesome),
                 contentDescription = null,
                 modifier = Modifier.size(32.dp),
                 tint = Color(0xFF1DB954)
@@ -524,12 +524,12 @@ fun InsightBottomSheetContent(
             Spacer(modifier = Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "AvidTune Insight",
+                    text = stringResource(R.string.avidtune_insight),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "Descubre tu año musical",
+                    text = stringResource(R.string.insight_discover_year),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                 )
@@ -559,7 +559,7 @@ fun InsightBottomSheetContent(
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Tu Año Musical",
+                        text = stringResource(R.string.insight_your_musical_year),
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -573,7 +573,7 @@ fun InsightBottomSheetContent(
                             color = Color.White
                         )
                         Text(
-                            text = "Toca para ver tus estadísticas completas",
+                            text = stringResource(R.string.insight_tap_to_view),
                             fontSize = 14.sp,
                             color = Color.White.copy(alpha = 0.9f)
                         )
@@ -591,19 +591,19 @@ fun InsightBottomSheetContent(
         ) {
             InsightFeatureItem(
                 icon = "🎵",
-                label = "Top\nCanciones"
+                label = stringResource(R.string.insight_top_songs)
             )
             InsightFeatureItem(
                 icon = "🎤",
-                label = "Top\nArtistas"
+                label = stringResource(R.string.insight_top_artists)
             )
             InsightFeatureItem(
                 icon = "📊",
-                label = "Estadísticas\nCompletas"
+                label = stringResource(R.string.insight_full_stats)
             )
             InsightFeatureItem(
                 icon = "📥",
-                label = "Descargar\nReporte"
+                label = stringResource(R.string.insight_download_report)
             )
         }
 
@@ -616,7 +616,7 @@ fun InsightBottomSheetContent(
             shape = RoundedCornerShape(12.dp)
         ) {
             Text(
-                text = "Ver AvidTune Insight Completo",
+                text = stringResource(R.string.insight_view_full),
                 modifier = Modifier.padding(8.dp),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold

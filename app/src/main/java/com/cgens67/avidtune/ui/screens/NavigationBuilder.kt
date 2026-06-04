@@ -74,14 +74,9 @@ fun NavGraphBuilder.navigationBuilder(
     composable("new_release") {
         NewReleaseScreen(navController, scrollBehavior)
     }
-//    composable("insight") {
-//        InsightScreen(navController)
-//    }
-
-
-
-
-
+    composable("insight") {
+        InsightScreen(navController)
+    }
 
     composable(
         route = "search/{query}",
