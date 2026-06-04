@@ -530,13 +530,13 @@ fun LyricsMenu(
                     NewAction(
                         icon = {
                             Icon(
-                                painter = painterResource(R.drawable.lyrics),
+                                painter = painterResource(R.drawable.format_align_left),
                                 contentDescription = null,
                                 modifier = Modifier.size(28.dp),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         },
-                        text = if (isRomanized) stringResource(R.string.show_original) else "Romanize",
+                        text = if (isRomanized) "Original" else "Romanize",
                         onClick = {
                             onRomanizeClick()
                             onDismiss()
