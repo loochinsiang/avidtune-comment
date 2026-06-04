@@ -1,10 +1,8 @@
 package com.cgens67.avidtune.ui.screens
 
-import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Paint
-import android.graphics.PathEffect
 import android.graphics.Shader
 import android.graphics.LinearGradient
 import android.graphics.Typeface
@@ -50,7 +48,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -79,7 +76,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.lerp
@@ -88,9 +84,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.cgens67.avidtune.LocalPlayerConnection
 import com.cgens67.avidtune.R
-import com.cgens67.avidtune.db.entities.Song
 import com.cgens67.avidtune.extensions.toMediaItem
-import com.cgens67.avidtune.playback.PlayerConnection
 import com.cgens67.avidtune.playback.queues.ListQueue
 import com.cgens67.avidtune.utils.ComposeToImage
 import com.cgens67.avidtune.viewmodels.InsightViewModel
@@ -214,7 +208,7 @@ fun InsightScreen(
                 1 -> TotalTimePage(totalMinutes, isActive = true)
                 2 -> TopSongPage(topSongs.firstOrNull(), topSongStats?.songCountListened ?: 0, isActive = true)
                 3 -> TopArtistsPage(topArtists, isActive = true)
-                4 -> SummaryPage(topSongs, totalMinutes, topArtists.firstOrNull()?.artist?.name, isActive = true, playerConnection)
+                4 -> SummaryPage(topSongs, totalMinutes, topArtists.firstOrNull()?.artist?.name, isActive = true)
             }
         }
 
@@ -262,6 +256,28 @@ fun InsightScreen(
                 contentDescription = stringResource(R.string.insight_close),
                 tint = Color.White
             )
+        }
+        
+        // Play button bottom for music integration
+        if (currentPage > 1) {
+            Button(
+                onClick = { 
+                    playerConnection?.playQueue(
+                        ListQueue(
+                            title = "AvidTune Insight",
+                            items = topSongs.map { it.toMediaItem() }
+                        )
+                    )
+                },
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 32.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black)
+            ) {
+                Icon(painter = painterResource(R.drawable.play), contentDescription = null, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(8.dp))
+                Text(stringResource(R.string.insight_play), fontWeight = FontWeight.Bold)
+            }
         }
     }
 }
@@ -514,7 +530,7 @@ fun TopArtistsPage(artists: List<com.cgens67.avidtune.db.entities.Artist>, isAct
 }
 
 @Composable
-fun SummaryPage(topSongs: List<com.cgens67.avidtune.db.entities.Song>, totalMinutes: Long, topArtistName: String?, isActive: Boolean, playerConnection: PlayerConnection?) {
+fun SummaryPage(topSongs: List<com.cgens67.avidtune.db.entities.Song>, totalMinutes: Long, topArtistName: String?, isActive: Boolean) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
@@ -553,7 +569,7 @@ fun SummaryPage(topSongs: List<com.cgens67.avidtune.db.entities.Song>, totalMinu
                                 start = Offset(0f, size.height / 2),
                                 end = Offset(size.width, size.height / 2),
                                 strokeWidth = 2.dp.toPx(),
-                                pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
+                                pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
                             )
                         }
 
@@ -578,7 +594,7 @@ fun SummaryPage(topSongs: List<com.cgens67.avidtune.db.entities.Song>, totalMinu
                                 start = Offset(0f, size.height / 2),
                                 end = Offset(size.width, size.height / 2),
                                 strokeWidth = 2.dp.toPx(),
-                                pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
+                                pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
                             )
                         }
 
@@ -596,7 +612,7 @@ fun SummaryPage(topSongs: List<com.cgens67.avidtune.db.entities.Song>, totalMinu
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Medium,
                                     maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
+                                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                                 )
                             }
                         }
@@ -645,23 +661,6 @@ fun SummaryPage(topSongs: List<com.cgens67.avidtune.db.entities.Song>, totalMinu
                         Spacer(Modifier.width(8.dp))
                         Text(stringResource(R.string.insight_download), fontWeight = FontWeight.Bold)
                     }
-                }
-
-                Button(
-                    onClick = { 
-                        playerConnection?.playQueue(
-                            ListQueue(
-                                title = "AvidTune Insight",
-                                items = topSongs.map { it.toMediaItem() }
-                            )
-                        )
-                    },
-                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black)
-                ) {
-                    Icon(painter = painterResource(R.drawable.play), contentDescription = null, modifier = Modifier.size(20.dp))
-                    Spacer(Modifier.width(8.dp))
-                    Text(stringResource(R.string.insight_play), fontWeight = FontWeight.Bold)
                 }
             }
         }
