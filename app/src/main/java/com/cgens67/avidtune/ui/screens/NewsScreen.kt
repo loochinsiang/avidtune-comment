@@ -76,6 +76,8 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -143,7 +145,7 @@ fun NewsScreen(
                                 expanded = false,
                                 onExpandedChange = {},
                                 placeholder = {
-                                    Text(text = "Search news...")
+                                    Text(text = stringResource(R.string.search_news_placeholder))
                                 },
                                 leadingIcon = {
                                     IconButton(
@@ -154,7 +156,7 @@ fun NewsScreen(
                                     ) {
                                         Icon(
                                             painter = painterResource(R.drawable.arrow_back),
-                                            contentDescription = "Back",
+                                            contentDescription = stringResource(R.string.back),
                                         )
                                     }
                                 },
@@ -165,7 +167,7 @@ fun NewsScreen(
                                         ) {
                                             Icon(
                                                 painter = painterResource(R.drawable.close),
-                                                contentDescription = "Close",
+                                                contentDescription = stringResource(R.string.close),
                                             )
                                         }
                                     }
@@ -185,7 +187,7 @@ fun NewsScreen(
                     LargeFlexibleTopAppBar(
                         title = {
                             Text(
-                                text = "News",
+                                text = stringResource(R.string.news),
                                 style = MaterialTheme.typography.headlineSmall,
                                 fontWeight = FontWeight.Bold,
                             )
@@ -197,7 +199,7 @@ fun NewsScreen(
                             ) {
                                 Icon(
                                     painter = painterResource(R.drawable.arrow_back),
-                                    contentDescription = "Back",
+                                    contentDescription = stringResource(R.string.back),
                                 )
                             }
                         },
@@ -205,13 +207,13 @@ fun NewsScreen(
                             IconButton(onClick = { isSearchActive = true }) {
                                 Icon(
                                     painter = painterResource(R.drawable.search),
-                                    contentDescription = "Search",
+                                    contentDescription = stringResource(R.string.search),
                                 )
                             }
                             IconButton(onClick = { viewModel.fetchNews() }) {
                                 Icon(
                                     painter = painterResource(R.drawable.sync),
-                                    contentDescription = "Retry",
+                                    contentDescription = stringResource(R.string.action_retry),
                                 )
                             }
                         },
@@ -365,14 +367,14 @@ private fun NewsListHeader(
                 verticalArrangement = Arrangement.spacedBy(2.dp),
             ) {
                 Text(
-                    text = if (isSearching) "Search Results" else "Latest News",
+                    text = stringResource(if (isSearching) R.string.search_results else R.string.latest_news),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
-                    text = "$itemCount Articles",
+                    text = pluralStringResource(R.plurals.n_articles, itemCount, itemCount),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.78f),
                 )
@@ -458,7 +460,7 @@ private fun NewsCard(
                             onClick = onNavigateToArticle,
                             shape = MaterialTheme.shapes.extraLarge,
                         ) {
-                            Text(text = "Read more")
+                            Text(text = stringResource(R.string.read_more))
                         }
                     }
                 }
@@ -491,7 +493,7 @@ private fun NewsMetaRow(
                 contentColor = MaterialTheme.colorScheme.onErrorContainer,
             ) {
                 Text(
-                    text = "IMPORTANT",
+                    text = stringResource(R.string.important),
                     style = MaterialTheme.typography.labelLarge,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
@@ -736,7 +738,7 @@ private fun NewsLoadingState(
             ) {
                 CircularWavyProgressIndicator(modifier = Modifier.size(64.dp))
                 Text(
-                    text = "Loading news...",
+                    text = stringResource(R.string.loading_news),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
                 )
@@ -752,8 +754,8 @@ private fun NewsEmptyState(
 ) {
     NewsStatePanel(
         icon = R.drawable.info,
-        title = if (isSearching) "No results found" else "No news available",
-        description = if (isSearching) "Try different keywords" else "Check back later",
+        title = stringResource(if (isSearching) R.string.no_results_found else R.string.no_news_available),
+        description = stringResource(if (isSearching) R.string.try_different_keywords else R.string.check_back_later),
         iconColor = MaterialTheme.colorScheme.primary,
         modifier = modifier,
     )
@@ -767,8 +769,8 @@ private fun NewsErrorState(
 ) {
     NewsStatePanel(
         icon = R.drawable.info,
-        title = "Something went wrong",
-        description = "Failed to fetch news",
+        title = stringResource(R.string.something_went_wrong),
+        description = stringResource(R.string.failed_to_fetch_news),
         iconColor = MaterialTheme.colorScheme.error,
         modifier = modifier,
         supportingText = message.takeIf { it.isNotBlank() },
@@ -781,7 +783,7 @@ private fun NewsErrorState(
                     contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
                 ),
             ) {
-                Text(text = "Retry")
+                Text(text = stringResource(R.string.action_retry))
             }
         },
     )
