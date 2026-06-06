@@ -783,7 +783,7 @@ private fun buildSettingsGroups(
             items = listOf(
                 SettingsItem(
                     icon = painterResource(R.drawable.info), // using info as newspaper icon fallback
-                    title = "News",
+                    title = stringResource(R.string.news),
                     badge = if (hasUnreadNews) "New" else null,
                     showUpdateIndicator = hasUnreadNews,
                     keywords = listOf("news", "updates", "announcements"),
