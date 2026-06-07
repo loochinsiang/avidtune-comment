@@ -80,7 +80,6 @@ import com.cgens67.avidtune.ui.menu.YouTubeAlbumMenu
 import com.cgens67.avidtune.ui.menu.YouTubeArtistMenu
 import com.cgens67.avidtune.ui.menu.YouTubePlaylistMenu
 import com.cgens67.avidtune.ui.menu.YouTubeSongMenu
-import com.cgens67.innertube.pages.SearchSummary
 import com.cgens67.avidtune.viewmodels.OnlineSearchViewModel
 import kotlinx.coroutines.launch
 
@@ -108,36 +107,6 @@ fun OnlineSearchResult(
             }
         }
     }
-    val allModeSections =
-        buildList<SearchSummary> {
-            searchSummary?.summaries?.firstOrNull()?.takeIf { it.items.isNotEmpty() }?.let(::add)
-
-            listOf(
-                FILTER_SONG to stringResource(R.string.filter_songs),
-                FILTER_VIDEO to stringResource(R.string.filter_videos),
-                FILTER_ALBUM to stringResource(R.string.filter_albums),
-                FILTER_ARTIST to stringResource(R.string.filter_artists),
-                FILTER_COMMUNITY_PLAYLIST to stringResource(R.string.filter_community_playlists),
-                FILTER_FEATURED_PLAYLIST to stringResource(R.string.filter_featured_playlists),
-            ).forEach { (sectionFilter, sectionTitle) ->
-                viewModel.viewStateMap[sectionFilter.value]
-                    ?.items
-                    ?.takeIf { it.isNotEmpty() }
-                    ?.let { items ->
-                        add(SearchSummary(title = sectionTitle, items = items))
-                    }
-            }
-        }
-    val isAllModeLoaded =
-        searchSummary != null ||
-            listOf(
-                FILTER_SONG,
-                FILTER_VIDEO,
-                FILTER_ALBUM,
-                FILTER_ARTIST,
-                FILTER_COMMUNITY_PLAYLIST,
-                FILTER_FEATURED_PLAYLIST,
-            ).all { viewModel.viewStateMap.containsKey(it.value) }
 
     LaunchedEffect(lazyListState) {
         snapshotFlow {
@@ -238,7 +207,7 @@ fun OnlineSearchResult(
             .asPaddingValues(),
     ) {
         if (searchFilter == null) {
-            allModeSections.forEachIndexed { index, summary ->
+            searchSummary?.summaries?.forEachIndexed { index, summary ->
                 if (index > 0) {
                     item(key = "divider_$index") {
                         HorizontalDivider(
@@ -283,7 +252,7 @@ fun OnlineSearchResult(
                 }
             }
 
-            if (allModeSections.isEmpty() && isAllModeLoaded) {
+            if (searchSummary?.summaries?.isEmpty() == true) {
                 item {
                     EmptyPlaceholder(
                         icon = R.drawable.search,
@@ -318,7 +287,7 @@ fun OnlineSearchResult(
             }
         }
 
-        if (searchFilter == null && allModeSections.isEmpty() && !isAllModeLoaded || searchFilter != null && itemsPage == null) {
+        if (searchFilter == null && searchSummary == null || searchFilter != null && itemsPage == null) {
             item {
                 ShimmerHost {
                     repeat(8) {
@@ -356,7 +325,7 @@ fun OnlineSearchResult(
                 coroutineScope.launch {
                     lazyListState.animateScrollToItem(0)
                 }
-            },
+            }
         )
     }
 }
