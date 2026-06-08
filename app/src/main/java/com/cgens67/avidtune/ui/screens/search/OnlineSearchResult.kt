@@ -41,6 +41,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
@@ -101,66 +102,63 @@ fun OnlineSearchResult(
     val searchFilter by viewModel.filter.collectAsState()
     val searchSummary = viewModel.summaryPage
 
-    val strSongs = stringResource(R.string.filter_songs)
-    val strVideos = stringResource(R.string.filter_videos)
-    val strAlbums = stringResource(R.string.filter_albums)
-    val strArtists = stringResource(R.string.filter_artists)
-    val strPlaylists = stringResource(R.string.filter_playlists)
+    // Localization strings
+    val topResultStr = stringResource(R.string.SearchResutls)
+    val songsStr = stringResource(R.string.filter_songs)
+    val videosStr = stringResource(R.string.filter_videos)
+    val albumsStr = stringResource(R.string.filter_albums)
+    val artistsStr = stringResource(R.string.filter_artists)
+    val playlistsStr = stringResource(R.string.filter_community_playlists)
 
-    // Group identical categories together, separate videos from songs, and sort them
-    val mergedSummaries = remember(searchSummary, strSongs, strVideos, strAlbums, strArtists, strPlaylists) {
-        val originalFirstTitle = searchSummary?.summaries?.firstOrNull()?.title ?: ""
+    // Aggregate, unify, and correctly sort the "All" section strictly into the 6 requested categories
+    val allModeSections = remember(
+        searchSummary, topResultStr, songsStr, videosStr, albumsStr, artistsStr, playlistsStr
+    ) {
+        buildList<SearchSummary> {
+            val summaries = searchSummary?.summaries ?: return@buildList
 
-        searchSummary?.summaries
-            ?.flatMap { summary ->
-                // YouTube Music API might group songs and videos together under "Songs"
-                if (summary.title == "Songs") {
-                    val actualSongs = summary.items.filter { it !is SongItem || !isActuallyVideo(it) }
-                    val actualVideos = summary.items.filter { it is SongItem && isActuallyVideo(it) }
+            if (summaries.isEmpty()) return@buildList
 
-                    listOfNotNull(
-                        if (actualSongs.isNotEmpty()) SearchSummary(strSongs, actualSongs) else null,
-                        if (actualVideos.isNotEmpty()) SearchSummary(strVideos, actualVideos) else null
-                    )
-                } else {
-                    // Translate other hardcoded categories
-                    val newTitle = when (summary.title) {
-                        "Albums" -> strAlbums
-                        "Artists" -> strArtists
-                        "Playlists" -> strPlaylists
-                        "Videos" -> strVideos
-                        else -> summary.title
+            // 1. Top Result
+            val topResult = summaries.first()
+            if (topResult.items.isNotEmpty()) {
+                add(SearchSummary(title = topResultStr, items = topResult.items))
+            }
+
+            // 2. Aggregate all remaining items into unified categorised lists (preventing duplicates)
+            val songs = mutableListOf<YTItem>()
+            val videos = mutableListOf<YTItem>()
+            val albums = mutableListOf<YTItem>()
+            val artists = mutableListOf<YTItem>()
+            val playlists = mutableListOf<YTItem>()
+
+            summaries.drop(1).forEach { summary ->
+                val titleLower = summary.title.lowercase()
+                val isVideoSection = titleLower.contains("video")
+
+                summary.items.forEach { item ->
+                    when (item) {
+                        is SongItem -> {
+                            if (isVideoSection) videos.add(item)
+                            else songs.add(item)
+                        }
+                        is AlbumItem -> albums.add(item)
+                        is ArtistItem -> artists.add(item)
+                        is PlaylistItem -> playlists.add(item)
                     }
-                    listOf(SearchSummary(newTitle, summary.items))
                 }
             }
-            ?.groupBy { it.title }
-            ?.map { (title, summaries) ->
-                SearchSummary(
-                    title = title,
-                    items = summaries.flatMap { it.items }.distinctBy { it.id }
-                )
-            }
-            ?.sortedBy { summary ->
-                val title = summary.title.lowercase()
-                when {
-                    // 1. Top Result
-                    summary.title == originalFirstTitle && originalFirstTitle !in listOf(strSongs, strVideos, strAlbums, strArtists, strPlaylists, "Songs", "Videos", "Albums", "Artists", "Playlists") -> 1
-                    // 2. Songs
-                    title == strSongs.lowercase() || title.contains("song") || title.contains("cancion") || title.contains("canción") -> 2
-                    // 3. Videos
-                    title == strVideos.lowercase() || title.contains("video") -> 3
-                    // 4. Albums
-                    title == strAlbums.lowercase() || title.contains("album") || title.contains("álbum") -> 4
-                    // 5. Artists
-                    title == strArtists.lowercase() || title.contains("artist") || title.contains("artista") -> 5
-                    // 6. Playlists
-                    title == strPlaylists.lowercase() || title.contains("playlist") || title.contains("lista") -> 6
-                    // 7. Others
-                    else -> 7
-                }
-            }
+
+            // 3. Add to the list in the exact requested order
+            if (songs.isNotEmpty()) add(SearchSummary(title = songsStr, items = songs.distinctBy { it.id }))
+            if (videos.isNotEmpty()) add(SearchSummary(title = videosStr, items = videos.distinctBy { it.id }))
+            if (albums.isNotEmpty()) add(SearchSummary(title = albumsStr, items = albums.distinctBy { it.id }))
+            if (artists.isNotEmpty()) add(SearchSummary(title = artistsStr, items = artists.distinctBy { it.id }))
+            if (playlists.isNotEmpty()) add(SearchSummary(title = playlistsStr, items = playlists.distinctBy { it.id }))
+        }
     }
+
+    val isAllModeLoaded = searchSummary != null
 
     val itemsPage by remember(searchFilter) {
         derivedStateOf {
@@ -269,7 +267,7 @@ fun OnlineSearchResult(
             .asPaddingValues(),
     ) {
         if (searchFilter == null) {
-            mergedSummaries?.forEachIndexed { index, summary ->
+            allModeSections.forEachIndexed { index, summary ->
                 if (index > 0) {
                     item(key = "divider_$index") {
                         HorizontalDivider(
@@ -304,7 +302,7 @@ fun OnlineSearchResult(
 
                 itemsIndexed(
                     items = summary.items,
-                    key = { itemIndex, item -> "${summary.title}/${item.id}/$itemIndex" },
+                    key = { itemIndex, item -> "all_${summary.title}_${item.id}_$itemIndex" },
                 ) { _, item ->
                     ytItemContent(item)
                 }
@@ -314,7 +312,7 @@ fun OnlineSearchResult(
                 }
             }
 
-            if (mergedSummaries?.isEmpty() == true) {
+            if (allModeSections.isEmpty() && isAllModeLoaded) {
                 item {
                     EmptyPlaceholder(
                         icon = R.drawable.search,
@@ -349,7 +347,7 @@ fun OnlineSearchResult(
             }
         }
 
-        if (searchFilter == null && searchSummary == null || searchFilter != null && itemsPage == null) {
+        if (searchFilter == null && !isAllModeLoaded || searchFilter != null && itemsPage == null) {
             item {
                 ShimmerHost {
                     repeat(8) {
@@ -390,10 +388,4 @@ fun OnlineSearchResult(
             }
         )
     }
-}
-
-private fun isActuallyVideo(item: YTItem): Boolean {
-    if (item !is SongItem) return false
-    val type = item.endpoint?.watchEndpointMusicSupportedConfigs?.watchEndpointMusicConfig?.musicVideoType
-    return type == "MUSIC_VIDEO_TYPE_OMV" || type == "MUSIC_VIDEO_TYPE_UGC"
 }
