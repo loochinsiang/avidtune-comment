@@ -1,3 +1,10 @@
+/*
+ * ArchiveTune (2026)
+ * © Chartreux Westia — github.com/koiverse
+ * GPL-3.0 License | Contributors: see git history
+ * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
+ */
+
 package com.cgens67.avidtune.ui.screens.search
 
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -41,7 +48,6 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
@@ -80,6 +86,7 @@ import com.cgens67.avidtune.ui.menu.YouTubeAlbumMenu
 import com.cgens67.avidtune.ui.menu.YouTubeArtistMenu
 import com.cgens67.avidtune.ui.menu.YouTubePlaylistMenu
 import com.cgens67.avidtune.ui.menu.YouTubeSongMenu
+import com.cgens67.innertube.pages.SearchSummary
 import com.cgens67.avidtune.viewmodels.OnlineSearchViewModel
 import kotlinx.coroutines.launch
 
@@ -100,6 +107,19 @@ fun OnlineSearchResult(
 
     val searchFilter by viewModel.filter.collectAsState()
     val searchSummary = viewModel.summaryPage
+    
+    // Group identical categories together to prevent duplicated separate items
+    val mergedSummaries = remember(searchSummary) {
+        searchSummary?.summaries
+            ?.groupBy { it.title }
+            ?.map { (title, summaries) ->
+                SearchSummary(
+                    title = title,
+                    items = summaries.flatMap { it.items }.distinctBy { it.id }
+                )
+            }
+    }
+    
     val itemsPage by remember(searchFilter) {
         derivedStateOf {
             searchFilter?.value?.let {
@@ -207,7 +227,7 @@ fun OnlineSearchResult(
             .asPaddingValues(),
     ) {
         if (searchFilter == null) {
-            searchSummary?.summaries?.forEachIndexed { index, summary ->
+            mergedSummaries?.forEachIndexed { index, summary ->
                 if (index > 0) {
                     item(key = "divider_$index") {
                         HorizontalDivider(
@@ -252,7 +272,7 @@ fun OnlineSearchResult(
                 }
             }
 
-            if (searchSummary?.summaries?.isEmpty() == true) {
+            if (mergedSummaries?.isEmpty() == true) {
                 item {
                     EmptyPlaceholder(
                         icon = R.drawable.search,
