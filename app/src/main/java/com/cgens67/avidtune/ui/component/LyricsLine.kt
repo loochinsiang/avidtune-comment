@@ -91,6 +91,8 @@ fun LyricsLine(
     isAutoScrollActive: Boolean,
     animateLyrics: Boolean = true,
     lyricsOffset: Long = 0L,
+    currentSkipSegments: List<Pair<Long, Long>> = emptyList(),
+    sponsorBlockEnabled: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     val (appleMusicLyricsBlur) = rememberPreference(AppleMusicLyricsBlurKey, true)
@@ -244,7 +246,9 @@ fun LyricsLine(
                 focusedAlpha = focusedAlpha,
                 alignment = agentTextAlign,
                 entryTime = entry.time,
-                animateLyrics = animateLyrics
+                animateLyrics = animateLyrics,
+                currentSkipSegments = currentSkipSegments,
+                sponsorBlockEnabled = sponsorBlockEnabled
             )
         } else {
             if (isActive && isSynced) {
@@ -360,7 +364,9 @@ private fun WordLevelLyrics(
     focusedAlpha: Float,
     alignment: TextAlign,
     entryTime: Long,
-    animateLyrics: Boolean = true
+    animateLyrics: Boolean = true,
+    currentSkipSegments: List<Pair<Long, Long>> = emptyList(),
+    sponsorBlockEnabled: Boolean = false
 ) {
     val density = LocalDensity.current
     val textMeasurer = rememberTextMeasurer()
@@ -372,7 +378,7 @@ private fun WordLevelLyrics(
     
     var smoothPosition by remember { mutableLongStateOf(entryTime + lyricsOffset) }
     
-    LaunchedEffect(isTracking) {
+    LaunchedEffect(isTracking, currentSkipSegments, sponsorBlockEnabled) {
         if (isTracking) {
             var lastPlayerPos = playerConnection.player.currentPosition
             var lastUpdateTime = System.currentTimeMillis()
@@ -385,11 +391,35 @@ private fun WordLevelLyrics(
                         lastUpdateTime = now
                     }
                     val elapsed = now - lastUpdateTime
-                    smoothPosition = lastPlayerPos + lyricsOffset + (if (playerConnection.player.isPlaying) elapsed else 0)
+                    val currentVideoPos = lastPlayerPos + (if (playerConnection.player.isPlaying) elapsed else 0)
+                    
+                    var sponsorBlockOffset = 0L
+                    if (sponsorBlockEnabled) {
+                        for (segment in currentSkipSegments) {
+                            if (currentVideoPos >= segment.second) {
+                                sponsorBlockOffset += (segment.second - segment.first)
+                            } else if (currentVideoPos > segment.first) {
+                                sponsorBlockOffset += (currentVideoPos - segment.first)
+                            }
+                        }
+                    }
+                    
+                    smoothPosition = currentVideoPos - sponsorBlockOffset + lyricsOffset
                 }
             }
         } else {
-            smoothPosition = playerConnection.player.currentPosition + lyricsOffset
+            val currentVideoPos = playerConnection.player.currentPosition
+            var sponsorBlockOffset = 0L
+            if (sponsorBlockEnabled) {
+                for (segment in currentSkipSegments) {
+                    if (currentVideoPos >= segment.second) {
+                        sponsorBlockOffset += (segment.second - segment.first)
+                    } else if (currentVideoPos > segment.first) {
+                        sponsorBlockOffset += (currentVideoPos - segment.first)
+                    }
+                }
+            }
+            smoothPosition = currentVideoPos - sponsorBlockOffset + lyricsOffset
         }
     }
 
