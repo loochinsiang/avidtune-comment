@@ -834,6 +834,11 @@
 
     <string name="romanize">Romaniser</string>
     <string name="hide_romanized">Masquer la romanisation</string>
+    
+    <!-- SponsorBlock setting -->
+    <string name="enable_sponsorblock">Activer SponsorBlock</string>
+    <string name="enable_sponsorblock_desc">Ignorer automatiquement les parties non musicales, les intros et les passages sponsorisés dans les clips musicaux</string>
+    <string name="skipped_sponsor">Segment ignoré (SponsorBlock)</string>
 
 
 </resources>
