@@ -5,6 +5,7 @@ import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
+import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
@@ -15,13 +16,16 @@ import timber.log.Timber
 data class SponsorSegment(
     val segment: List<Float>,
     val category: String,
-    val actionType: String
+    val actionType: String = "skip"
 )
 
 object SponsorBlock {
     private val client = HttpClient(CIO) {
         install(ContentNegotiation) {
-            json(Json { ignoreUnknownKeys = true })
+            json(Json { 
+                ignoreUnknownKeys = true 
+                coerceInputValues = true
+            })
         }
         expectSuccess = false
     }
@@ -30,7 +34,9 @@ object SponsorBlock {
         return try {
             val response = client.get("https://sponsor.ajay.app/api/skipSegments") {
                 parameter("videoID", videoId)
-                parameter("categories", """["sponsor", "intro", "outro", "interaction", "selfpromo", "music_offtopic"]""")
+                parameter("categories", """["sponsor","intro","outro","interaction","selfpromo","music_offtopic"]""")
+                parameter("actionTypes", """["skip","mute"]""")
+                header("User-Agent", "AvidTune/1.0")
             }
             if (response.status.value in 200..299) {
                 response.body()
