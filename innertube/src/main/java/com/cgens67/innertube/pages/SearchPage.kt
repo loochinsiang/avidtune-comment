@@ -152,6 +152,10 @@ object SearchPage {
                 )
             }
             renderer.isSong -> {
+                val firstRunText = secondaryLine.firstOrNull()?.firstOrNull()?.text
+                val isVideoOrEpisode = firstRunText in listOf("Episode", "Episodio", "Video", "Vídeo")
+                val fallbackIndex = if (isVideoOrEpisode && secondaryLine.size > 1) 1 else 0
+
                 SongItem(
                     id = renderer.videoId ?: return null,
                     title =
@@ -163,14 +167,14 @@ object SearchPage {
                             ?.firstOrNull()
                             ?.text ?: return null,
                     artists =
-                        secondaryLine.firstOrNull()?.oddElements()?.map {
+                        secondaryLine.getOrNull(fallbackIndex)?.oddElements()?.map {
                             Artist(
                                 name = it.text,
                                 id = it.navigationEndpoint?.browseEndpoint?.browseId,
                             )
                         } ?: return null,
                     album =
-                        secondaryLine.getOrNull(1)?.firstOrNull()?.takeIf { it.navigationEndpoint?.browseEndpoint != null }?.let {
+                        secondaryLine.getOrNull(fallbackIndex + 1)?.firstOrNull()?.takeIf { it.navigationEndpoint?.browseEndpoint != null }?.let {
                             Album(
                                 name = it.text,
                                 id = it.navigationEndpoint?.browseEndpoint?.browseId!!,
