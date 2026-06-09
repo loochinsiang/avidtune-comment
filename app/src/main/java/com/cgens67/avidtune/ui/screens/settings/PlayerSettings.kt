@@ -71,6 +71,7 @@ import com.cgens67.avidtune.constants.AudioQualityKey
 import com.cgens67.avidtune.constants.AutoSkipNextOnErrorKey
 import com.cgens67.avidtune.constants.PersistentQueueKey
 import com.cgens67.avidtune.constants.SkipSilenceKey
+import com.cgens67.avidtune.constants.SponsorBlockEnabledKey
 import com.cgens67.avidtune.constants.StopMusicOnTaskClearKey
 import com.cgens67.avidtune.playback.PlayerConnection
 import com.cgens67.avidtune.ui.component.EnumListPreference
@@ -102,6 +103,10 @@ fun PlayerSettings(
     val (skipSilence, onSkipSilenceChange) = rememberPreference(
         SkipSilenceKey,
         defaultValue = false
+    )
+    val (sponsorBlockEnabled, onSponsorBlockEnabledChange) = rememberPreference(
+        SponsorBlockEnabledKey,
+        defaultValue = true
     )
     val (audioNormalization, onAudioNormalizationChange) = rememberPreference(
         AudioNormalizationKey,
@@ -150,6 +155,14 @@ fun PlayerSettings(
                     icon = { Icon(painterResource(R.drawable.fast_forward), null) },
                     checked = skipSilence,
                     onCheckedChange = onSkipSilenceChange
+                )},
+
+                {SwitchPreference(
+                    title = { Text(stringResource(R.string.enable_sponsorblock)) },
+                    description = stringResource(R.string.enable_sponsorblock_desc),
+                    icon = { Icon(painterResource(R.drawable.skip_next), null) },
+                    checked = sponsorBlockEnabled,
+                    onCheckedChange = onSponsorBlockEnabledChange
                 )},
 
                 {SwitchPreference(
