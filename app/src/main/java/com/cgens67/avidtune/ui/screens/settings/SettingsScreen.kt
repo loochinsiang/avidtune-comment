@@ -72,7 +72,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -80,7 +79,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -133,7 +131,6 @@ import com.cgens67.avidtune.R
 import com.cgens67.avidtune.constants.AccountEmailKey
 import com.cgens67.avidtune.constants.AccountNameKey
 import com.cgens67.avidtune.constants.InnerTubeCookieKey
-import com.cgens67.avidtune.ui.component.ChangelogScreen
 import com.cgens67.avidtune.ui.component.IconButton
 import com.cgens67.avidtune.ui.component.TopSearch
 import com.cgens67.avidtune.ui.utils.backToMain
@@ -298,7 +295,6 @@ fun SettingsScreen(
     var query by remember { mutableStateOf(TextFieldValue()) }
     val focusRequester = remember { FocusRequester() }
 
-    var showChangelogSheet by remember { mutableStateOf(false) }
     var showUpdateDialog by remember { mutableStateOf(false) }
 
     var hasUpdate by remember { mutableStateOf(false) }
@@ -388,7 +384,7 @@ fun SettingsScreen(
 
     val quickActions = buildQuickActions(navController, resetSearch)
     val integrationActions = buildIntegrationActions(navController, resetSearch)
-    val settingsGroups = buildSettingsGroups(navController, resetSearch, onChangelogClick = { showChangelogSheet = true }, hasUnreadNews)
+    val settingsGroups = buildSettingsGroups(navController, resetSearch, onChangelogClick = { navController.navigate("settings/changelog") }, hasUnreadNews)
     val internalItems = buildInternalItems(navController, resetSearch)
 
     val queryText = query.text.trim()
@@ -589,27 +585,6 @@ fun SettingsScreen(
                     )
                 }
             }
-        }
-    }
-
-    if (showChangelogSheet) {
-        ModalBottomSheet(
-            onDismissRequest = { showChangelogSheet = false },
-            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-            containerColor = MaterialTheme.colorScheme.surface,
-            contentColor = MaterialTheme.colorScheme.onSurface,
-            dragHandle = {
-                Surface(
-                    modifier = Modifier
-                        .padding(vertical = 12.dp)
-                        .width(32.dp)
-                        .height(4.dp),
-                    shape = RoundedCornerShape(2.dp),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
-                ) {}
-            }
-        ) {
-            ChangelogScreen(onDismiss = { showChangelogSheet = false })
         }
     }
 
