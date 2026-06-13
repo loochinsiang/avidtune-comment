@@ -62,6 +62,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.carousel.HorizontalCenteredHeroCarousel
+import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -130,7 +131,7 @@ fun ViewNewsScreen(
         containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
-            LargeTopAppBar(
+            LargeFlexibleTopAppBar(
                 title = {
                     Text(
                         text = newsItem?.title ?: "",
