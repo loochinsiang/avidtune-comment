@@ -83,6 +83,7 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.toArgb
@@ -893,7 +894,11 @@ fun PlayerBackground(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .let { if (!disableBlur) it.blur(80.dp) else it }
-                                .graphicsLayer(alpha = 1f, clip = true)
+                                .graphicsLayer(
+                                    alpha = 1f, 
+                                    clip = true,
+                                    compositingStrategy = CompositingStrategy.Offscreen
+                                )
                                 .drawWithContent {
                                     drawContent()
                                     drawRect(
