@@ -91,7 +91,7 @@ import java.util.concurrent.TimeUnit
 @Composable
 fun ChangelogScreen(
     onDismiss: () -> Unit = {},
-    versionTag: String = "v${BuildConfig.VERSION_NAME}"
+    versionTag: String = BuildConfig.VERSION_NAME
 ) {
     val context = LocalContext.current
     var changelogSections by remember { mutableStateOf<List<ChangelogSection>>(emptyList()) }
@@ -251,6 +251,7 @@ fun ChangelogScreen(
                     for (i in 0 until array.length()) {
                         val obj = array.getJSONObject(i)
                         val tagName = obj.getString("tag_name")
+
                         val name = obj.optString("name", tagName)
                         val publishedAt = obj.getString("published_at")
                         val formattedDate = try {
