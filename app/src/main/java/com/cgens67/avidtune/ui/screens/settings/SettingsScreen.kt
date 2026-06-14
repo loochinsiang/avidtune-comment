@@ -1193,7 +1193,6 @@ data class SettingsContentState(
     val onClearSearchHistory: () -> Unit,
 )
 
-@Composable
 private fun LazyListScope.SearchHistorySection(state: SettingsContentState, pad: Dp) {
     if (state.searchHistory.isNotEmpty()) {
         item(key = "search_history_header") {
