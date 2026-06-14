@@ -888,4 +888,9 @@
     <string name="skipped_sponsor">已跳过片段 (SponsorBlock)</string>
     
     <string name="fallback_artist_desc">%1$s 是一位歌手。</string>
+    
+    <string name="current_version">当前</string>
+    <string name="error_loading_changelog">加载更新日志时出错</string>
+    <string name="error_loading_commits">加载提交记录时出错</string>
+    <string name="cached">已缓存</string>
 </resources>
