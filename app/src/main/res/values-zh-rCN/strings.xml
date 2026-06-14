@@ -818,19 +818,55 @@
 
     <string name="romanize">罗马音</string>
     <string name="hide_romanized">隐藏罗马音</string>
-
+    
     <!-- Insight Strings -->
-    <string name="avidtune_insight">AvidTune 年度总结</string>
-    <string name="insight_discover_year">探索你的年度音乐</string>
-    <string name="insight_your_musical_year">你的年度音乐</string>
-    <string name="insight_tap_to_view">点击查看你的完整统计数据</string>
-    <string name="insight_top_songs">最爱\n歌曲</string>
-    <string name="insight_top_artists">最爱\n歌手</string>
+    <string name="avidtune_insight">AvidTune Insight</string>
+    <string name="insight_discover_year">探索您的年度音乐</string>
+    <string name="insight_your_musical_year">您的年度音乐</string>
+    <string name="insight_tap_to_view">点击查看完整统计数据</string>
+    <string name="insight_top_songs">热门\n歌曲</string>
+    <string name="insight_top_artists">热门\n歌手</string>
     <string name="insight_full_stats">完整\n统计</string>
     <string name="insight_download_report">下载\n报告</string>
-    <string name="insight_view_full">查看完整 AvidTune 年度总结</string>
-    <string name="insight_no_data">今年暂无可用数据。</string>
+    <string name="insight_view_full">查看完整的 AvidTune Insight</string>
     <string name="insight_minutes">分钟</string>
+    <string name="insight_playlist_name">AvidTune Insight %1$d</string>
+    <string name="insight_msg_tease_0">希望您不会感到失望...</string>
+    <string name="insight_msg_reveal_0">只有 **%1$d 分钟**。才刚刚热身吗？</string>
+    <string name="insight_msg_tease_1000">看来您是最近才发现我们的...</string>
+    <string name="insight_msg_reveal_1000">您为音乐投入了 **%1$d 分钟**。</string>
+    <string name="insight_msg_tease_5000">音乐绝对是您的真爱。</string>
+    <string name="insight_msg_reveal_5000">**%1$d 分钟** 是您这一年绝佳的背景音乐。</string>
+    <string name="insight_msg_tease_15000">您有摘下过耳机吗？</string>
+    <string name="insight_msg_reveal_15000">**%1$d 分钟** 说明音乐就像是您的氧气。</string>
+    <string name="insight_msg_tease_40000">您...还好吗？</string>
+    <string name="insight_msg_reveal_40000">您简直在这里住上了 **%1$d 分钟**。</string>
+    <string name="insight_msg_tease_default">看来我们都数不清了！</string>
+    <string name="insight_msg_reveal_default">但您绝对听了 **%1$d 分钟** 的音乐。</string>
+    <string name="insight_title">AvidTune Insight</string>
+    <string name="insight_intro_subtitle">回顾您的年度音乐之旅。</string>
+    <string name="insight_lets_go">出发吧！</string>
+    <string name="insight_total_songs_title">您听过的\n歌曲</string>
+    <string name="insight_total_songs_subtitle">真是海量的旋律啊。</string>
+    <string name="insight_top_song_title">但您绝对的\n最爱是...</string>
+    <string name="insight_no_data">暂无数据</string>
+    <string name="insight_listened_for_minutes">收听了 %1$d 分钟</string>
+    <string name="insight_minutes_short">%1$d 分钟</string>
+    <string name="insight_top_5_songs">您的前 5 首歌曲</string>
+    <string name="insight_total_albums_title">您发现的\n专辑</string>
+    <string name="insight_total_albums_subtitle">经历了许多次跳过与单曲循环。</string>
+    <string name="insight_top_album_title">但有一张专辑\n占据了绝对主导。</string>
+    <string name="insight_top_5_albums">您的前 5 张\n专辑</string>
+    <string name="insight_total_artists_title">您听过的\n歌手</string>
+    <string name="insight_total_artists_subtitle">您的音乐品味相当广泛。</string>
+    <string name="insight_top_artist_title">您的最爱歌手</string>
+    <string name="insight_top_5_artists">前 5 名歌手</string>
+    <string name="insight_playlist_ready">您的 Insight 歌单\n已准备就绪。</string>
+    <string name="insight_add_to_library">添加到资料库</string>
+    <string name="insight_saved">已保存！</string>
+    <string name="insight_thank_you">感谢您的聆听</string>
+    <string name="insight_see_you">下次见！</string>
+    <string name="insight_close">关闭 Insight</string>
     
     <!-- News -->
     <string name="news">新闻</string>
