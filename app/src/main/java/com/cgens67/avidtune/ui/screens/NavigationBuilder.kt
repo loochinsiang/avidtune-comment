@@ -19,7 +19,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.cgens67.avidtune.BuildConfig
-import com.cgens67.avidtune.ui.component.ChangelogScreen
+import com.cgens67.avidtune.ui.screens.settings.ChangelogScreen
 import com.cgens67.avidtune.ui.screens.artist.ArtistItemsScreen
 import com.cgens67.avidtune.ui.screens.artist.ArtistScreen
 import com.cgens67.avidtune.ui.screens.artist.ArtistSongsScreen
