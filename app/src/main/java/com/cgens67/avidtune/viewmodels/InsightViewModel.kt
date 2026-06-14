@@ -13,10 +13,10 @@ import com.cgens67.avidtune.db.entities.Album
 import com.cgens67.avidtune.db.entities.Artist
 import com.cgens67.avidtune.db.entities.PlaylistEntity
 import com.cgens67.avidtune.db.entities.SongWithStats
-import com.cgens67.avidtune.ui.screens.insight.PlaylistCreationState
-import com.cgens67.avidtune.ui.screens.insight.WrappedConstants
-import com.cgens67.avidtune.ui.screens.insight.WrappedScreenType
-import com.cgens67.avidtune.ui.screens.insight.WrappedState
+import com.cgens67.avidtune.ui.screens.PlaylistCreationState
+import com.cgens67.avidtune.ui.screens.WrappedConstants
+import com.cgens67.avidtune.ui.screens.WrappedScreenType
+import com.cgens67.avidtune.ui.screens.WrappedState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -84,8 +84,6 @@ class InsightViewModel @Inject constructor(
                     if (createdPlaylist != null) {
                         val songIds = allSongs.map { it.id }
                         databaseDao.addSongToPlaylist(createdPlaylist, songIds)
-                        
-                        // Copy image file to persistent playlist images directory
                         com.cgens67.avidtune.utils.saveCustomPlaylistImage(context, playlistId, android.net.Uri.fromFile(file))
                     }
                 }
