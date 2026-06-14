@@ -846,6 +846,11 @@
     <string name="error_loading_changelog">Erreur lors du chargement du journal</string>
     <string name="error_loading_commits">Erreur lors du chargement des commits</string>
     <string name="cached">En cache</string>
+    
+    <!-- Settings Search & Layout -->
+    <string name="internal_settings">Paramètres internes</string>
+    <string name="github">GitHub</string>
+    <string name="new_badge">Nouveau</string>
 
 
 </resources>
