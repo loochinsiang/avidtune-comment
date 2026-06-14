@@ -845,6 +845,7 @@
     <string name="insight_download_report">Download\nreport</string>
     <string name="insight_view_full">View full AvidTune Insight</string>
     <string name="insight_no_data">No data available for the year yet.</string>
+    <string name="insight_minutes">Minutes</string>
     
     <!-- News -->
     <string name="news">News</string>
