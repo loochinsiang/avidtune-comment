@@ -66,7 +66,6 @@ android {
         compose = true
     }
 
-    // ✅ Alineamos TODO a Java 21
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_21
@@ -170,6 +169,12 @@ dependencies {
     implementation(libs.ktor.client.cio)
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.serialization.json)
+    
+    // WebSockets & Server components required for Music Together feature
+    implementation("io.ktor:ktor-client-websockets:3.0.3")
+    implementation("io.ktor:ktor-server-core:3.0.3")
+    implementation("io.ktor:ktor-server-cio:3.0.3")
+    implementation("io.ktor:ktor-server-websockets:3.0.3")
 
     coreLibraryDesugaring(libs.desugaring)
 

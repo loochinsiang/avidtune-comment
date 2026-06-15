@@ -109,6 +109,8 @@ import com.cgens67.avidtune.playback.queues.EmptyQueue
 import com.cgens67.avidtune.playback.queues.Queue
 import com.cgens67.avidtune.playback.queues.YouTubeQueue
 import com.cgens67.avidtune.playback.queues.filterExplicit
+import com.cgens67.avidtune.together.TogetherManager
+import com.cgens67.avidtune.together.TogetherRoomSettings
 import com.cgens67.avidtune.utils.CoilBitmapLoader
 import com.cgens67.avidtune.utils.DiscordRPC
 import com.cgens67.avidtune.utils.NetworkConnectivityObserver
@@ -178,6 +180,18 @@ class MusicService :
 
     private var scope = CoroutineScope(Dispatchers.Main) + Job()
     private val binder = MusicBinder()
+
+    // ---- TOGETHER INTEGRATION HOOKS ----
+    val togetherManager by lazy { TogetherManager(scope, player) }
+    val togetherSessionState get() = togetherManager.sessionState
+    fun updateTogetherSettings(settings: TogetherRoomSettings) = togetherManager.updateSettings(settings)
+    fun kickTogetherParticipant(pid: String) = togetherManager.kickParticipant(pid)
+    fun banTogetherParticipant(pid: String) = togetherManager.banParticipant(pid)
+    fun approveTogetherParticipant(pid: String, approved: Boolean) = togetherManager.approveParticipant(pid, approved)
+    fun startTogetherHost(port: Int, displayName: String, settings: TogetherRoomSettings) = togetherManager.startTogetherHost(port, displayName, settings)
+    fun joinTogether(joinLink: String, displayName: String) = togetherManager.joinTogether(joinLink, displayName)
+    fun leaveTogether() = togetherManager.leaveTogether()
+    // ------------------------------------
 
     private lateinit var connectivityManager: ConnectivityManager
     lateinit var connectivityObserver: NetworkConnectivityObserver
