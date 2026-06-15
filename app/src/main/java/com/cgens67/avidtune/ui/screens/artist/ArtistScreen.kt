@@ -41,6 +41,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -50,6 +51,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -93,6 +95,7 @@ import com.cgens67.avidtune.LocalPlayerConnection
 import com.cgens67.avidtune.R
 import com.cgens67.avidtune.constants.AppBarHeight
 import com.cgens67.avidtune.db.entities.ArtistEntity
+import com.cgens67.avidtune.extensions.toMediaItem
 import com.cgens67.avidtune.extensions.togglePlayPause
 import com.cgens67.avidtune.models.toMediaMetadata
 import com.cgens67.avidtune.playback.queues.YouTubeQueue
@@ -109,6 +112,7 @@ import com.cgens67.avidtune.ui.menu.SongMenu
 import com.cgens67.avidtune.ui.menu.YouTubeAlbumMenu
 import com.cgens67.avidtune.ui.menu.YouTubeArtistMenu
 import com.cgens67.avidtune.ui.menu.YouTubePlaylistMenu
+import com.cgens67.avidtune.ui.menu.YouTubeSongMenu
 import com.cgens67.avidtune.ui.utils.backToMain
 import com.cgens67.avidtune.ui.utils.fadingEdge
 import com.cgens67.avidtune.ui.utils.resize
@@ -948,7 +952,7 @@ fun ArtistScreen(
                     Text(artistPage?.artist?.title.orEmpty())
             },
             navigationIcon = {
-                IconButton(
+                com.cgens67.avidtune.ui.component.IconButton(
                     onClick = navController::navigateUp,
                     onLongClick = navController::backToMain,
                 ) {
