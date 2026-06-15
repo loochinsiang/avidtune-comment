@@ -920,5 +920,53 @@
     <string name="internal_settings">Internal Settings</string>
     <string name="github">GitHub</string>
     <string name="new_badge">New</string>
+    
+    <resources>
+    <string name="music_together">Music Together</string>
+    <string name="together_display_name">Display Name</string>
+    <string name="together_display_name_placeholder">Enter your name</string>
+    <string name="together_port">Port</string>
+    <string name="together_host_section">Host a Session</string>
+    <string name="together_lan">Local Network</string>
+    <string name="together_allow_guests_add">Allow guests to add tracks</string>
+    <string name="together_allow_guests_control">Allow guests to control playback</string>
+    <string name="together_require_approval">Require approval to join</string>
+    <string name="together_join_section">Join a Session</string>
+    <string name="together_join_link_hint">Paste join link here</string>
+    <string name="together_kick">Kick</string>
+    <string name="together_kick_confirm">Are you sure you want to kick %1$s?</string>
+    <string name="together_ban">Ban</string>
+    <string name="together_ban_confirm">Are you sure you want to ban %1$s?</string>
+    <string name="together_status">Status</string>
+    <string name="together_idle">Idle</string>
+    <string name="together_hosting">Hosting</string>
+    <string name="together_joining">Joining…</string>
+    <string name="together_waiting_approval">Waiting for approval…</string>
+    <string name="together_connected">Connected</string>
+    <string name="together_error_state">Error</string>
+    <string name="together_participants">Participants</string>
+    <string name="together_connected_count">%1$d connected</string>
+    <string name="together_role_host">Host</string>
+    <string name="together_role_guest">Guest</string>
+    <string name="together_pending_approval">Pending Approval</string>
+    <string name="together_welcome_title">Welcome to Music Together</string>
+    <string name="together_welcome_body">Listen to music simultaneously with friends over the same network.</string>
+    <string name="together_welcome_host_title">Host</string>
+    <string name="together_welcome_host_body">Start a session and share the link with your friends.</string>
+    <string name="together_welcome_join_title">Join</string>
+    <string name="together_welcome_join_body">Paste a session link to join an existing room.</string>
+    <string name="together_welcome_permissions_title">Permissions</string>
+    <string name="together_welcome_permissions_body">The host controls who can add songs and play/pause.</string>
+    <string name="together_dont_show_again">Don\'t show again</string>
+    <string name="start_session">Start Session</string>
+    <string name="join_session">Join Session</string>
+    <string name="session_link">Session Link</string>
+    <string name="paste">Paste</string>
+    <string name="join">Join</string>
+    <string name="joined">Joined</string>
+    <string name="leave">Leave</string>
+    <string name="connecting">Connecting…</string>
+    <string name="participants">Participants</string>
+    <string name="got_it">Got it</string>
 
 </resources>
