@@ -53,7 +53,7 @@ import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.server.application.install
 import io.ktor.server.cio.CIO
-import io.ktor.server.engine.EmbeddedServer
+import io.ktor.server.engine.ApplicationEngine
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.routing.routing
 import io.ktor.server.websocket.webSocket
@@ -121,42 +121,53 @@ object TogetherLink {
 // --- MANAGER ---
 class TogetherManager(val scope: CoroutineScope, val player: ExoPlayer) {
     val sessionState = MutableStateFlow<TogetherSessionState>(TogetherSessionState.Idle)
-    private var serverEngine: EmbeddedServer<*, *>? = null
+    private var serverEngine: ApplicationEngine? = null
     private var clientSession: DefaultClientWebSocketSession? = null
     private val httpClient = HttpClient(ClientCIO) { install(WebSockets) }
     private var roomSettings = TogetherRoomSettings()
     private val clients = ConcurrentHashMap<String, DefaultClientWebSocketSession>()
 
     fun startTogetherHost(port: Int, displayName: String, settings: TogetherRoomSettings) {
-        scope.launch {
-            leaveTogether()
-            roomSettings = settings
-            val sId = UUID.randomUUID().toString()
-            val sKey = UUID.randomUUID().toString()
-            val hostIp = getIpAddress() ?: "127.0.0.1"
+        leaveTogether()
+        scope.launch(Dispatchers.IO) {
+            try {
+                roomSettings = settings
+                val sId = UUID.randomUUID().toString()
+                val sKey = UUID.randomUUID().toString()
+                val hostIp = getIpAddress() ?: "127.0.0.1"
 
-            serverEngine = embeddedServer(CIO, port = port, host = "0.0.0.0") {
-                install(io.ktor.server.websocket.WebSockets)
-                routing {
-                    webSocket("/together") {
-                        val txt = (incoming.receive() as? Frame.Text)?.readText() ?: return@webSocket
-                        val hello = TogetherJson.json.decodeFromString<TogetherMessage>(txt) as? ClientHello ?: return@webSocket
-                        val pId = UUID.randomUUID().toString()
-                        send(TogetherJson.json.encodeToString(TogetherMessage.serializer(), ServerWelcome(TogetherProtocolVersion, sId, pId, ServerRole.GUEST, false, roomSettings)))
-                        for (frame in incoming) { } // Keep-Alive loop
+                val engine = embeddedServer(CIO, port = port, host = "0.0.0.0") {
+                    install(io.ktor.server.websocket.WebSockets)
+                    routing {
+                        webSocket("/together") {
+                            val txt = (incoming.receive() as? Frame.Text)?.readText() ?: return@webSocket
+                            val hello = TogetherJson.json.decodeFromString<TogetherMessage>(txt) as? ClientHello ?: return@webSocket
+                            val pId = UUID.randomUUID().toString()
+                            send(TogetherJson.json.encodeToString(TogetherMessage.serializer(), ServerWelcome(TogetherProtocolVersion, sId, pId, ServerRole.GUEST, false, roomSettings)))
+                            for (frame in incoming) { } // Keep-Alive loop
+                        }
                     }
                 }
-            }.start(wait = false)
+                engine.start(wait = false)
+                serverEngine = engine
 
-            val link = TogetherLink.encode(TogetherJoinInfo(hostIp, port, sId, sKey))
-            sessionState.value = TogetherSessionState.Hosting(sId, link, hostIp, port, settings, TogetherRoomState(sId, "host"))
+                val link = TogetherLink.encode(TogetherJoinInfo(hostIp, port, sId, sKey))
+                sessionState.value = TogetherSessionState.Hosting(sId, link, hostIp, port, settings, TogetherRoomState(sId, "host"))
+            } catch (e: Exception) {
+                e.printStackTrace()
+                sessionState.value = TogetherSessionState.Error(e.message ?: "Failed to start server")
+            }
         }
     }
 
     fun joinTogether(joinLink: String, displayName: String) {
-        scope.launch {
-            val info = TogetherLink.decode(joinLink) ?: return@launch
-            leaveTogether()
+        leaveTogether()
+        scope.launch(Dispatchers.IO) {
+            val info = TogetherLink.decode(joinLink)
+            if (info == null) {
+                sessionState.value = TogetherSessionState.Error("Invalid link")
+                return@launch
+            }
             sessionState.value = TogetherSessionState.Joining(joinLink)
             try {
                 httpClient.webSocket(info.toWebSocketUrl()) {
@@ -166,16 +177,30 @@ class TogetherManager(val scope: CoroutineScope, val player: ExoPlayer) {
                     for (f in incoming) { }
                 }
             } catch (e: Exception) {
-                sessionState.value = TogetherSessionState.Error("Failed to connect")
+                sessionState.value = TogetherSessionState.Error("Failed to connect: ${e.message}")
             }
         }
     }
 
     fun leaveTogether() {
-        scope.launch {
-            serverEngine?.stop(100, 500); serverEngine = null
-            clientSession?.close(); clientSession = null
-            sessionState.value = TogetherSessionState.Idle
+        val engineToStop = serverEngine
+        serverEngine = null
+        val sessionToClose = clientSession
+        clientSession = null
+        
+        sessionState.value = TogetherSessionState.Idle
+        
+        scope.launch(Dispatchers.IO) {
+            try {
+                engineToStop?.stop(100, 500)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            try {
+                sessionToClose?.close()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 
@@ -200,6 +225,7 @@ fun MusicTogetherScreen(
 ) {
     val context = LocalContext.current
     val playerConnection = LocalPlayerConnection.current
+    @Suppress("DEPRECATION")
     val clipboard = LocalClipboardManager.current
     val haptic = LocalHapticFeedback.current
 
