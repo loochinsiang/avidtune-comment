@@ -625,13 +625,13 @@ fun ArtistScreen(
                                                 R.drawable.subscribe
                                         ),
                                         contentDescription = null,
-                                        modifier = Modifier.size(20.dp),
+                                        modifier = Modifier.size(18.dp),
                                         tint = if (libraryArtist?.artist?.bookmarkedAt != null)
                                             MaterialTheme.colorScheme.onPrimary
                                         else
                                             LocalContentColor.current
                                     )
-                                    Spacer(Modifier.size(ToggleButtonDefaults.IconSpacing))
+                                    Spacer(Modifier.width(4.dp))
                                     Text(
                                         text = stringResource(
                                             if (libraryArtist?.artist?.bookmarkedAt != null)
@@ -639,7 +639,9 @@ fun ArtistScreen(
                                             else
                                                 R.string.subscribe
                                         ),
-                                        style = MaterialTheme.typography.labelMedium
+                                        style = MaterialTheme.typography.labelMedium,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
                                     )
                                 }
 
@@ -660,13 +662,15 @@ fun ArtistScreen(
                                         Icon(
                                             painter = painterResource(R.drawable.radio),
                                             contentDescription = null,
-                                            modifier = Modifier.size(20.dp),
+                                            modifier = Modifier.size(18.dp),
                                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
-                                        Spacer(Modifier.size(ToggleButtonDefaults.IconSpacing))
+                                        Spacer(Modifier.width(4.dp))
                                         Text(
                                             text = stringResource(R.string.radio),
-                                            style = MaterialTheme.typography.labelMedium
+                                            style = MaterialTheme.typography.labelMedium,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
                                         )
                                     }
                                 }
@@ -692,13 +696,15 @@ fun ArtistScreen(
                                         Icon(
                                             painter = painterResource(R.drawable.shuffle),
                                             contentDescription = stringResource(R.string.shuffle),
-                                            modifier = Modifier.size(20.dp),
+                                            modifier = Modifier.size(18.dp),
                                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
-                                        Spacer(Modifier.size(ToggleButtonDefaults.IconSpacing))
+                                        Spacer(Modifier.width(4.dp))
                                         Text(
                                             text = stringResource(R.string.shuffle),
-                                            style = MaterialTheme.typography.labelMedium
+                                            style = MaterialTheme.typography.labelMedium,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
                                         )
                                     }
                                 }
@@ -978,31 +984,45 @@ fun ArtistScreen(
         TopAppBar(
             title = { },
             navigationIcon = {
-                com.cgens67.avidtune.ui.component.IconButton(
-                    onClick = navController::navigateUp,
-                    onLongClick = navController::backToMain,
+                Surface(
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    modifier = Modifier.padding(start = 8.dp)
                 ) {
-                    Icon(
-                        painterResource(R.drawable.arrow_back),
-                        contentDescription = null,
-                    )
+                    com.cgens67.avidtune.ui.component.IconButton(
+                        onClick = navController::navigateUp,
+                        onLongClick = navController::backToMain,
+                    ) {
+                        Icon(
+                            painterResource(R.drawable.arrow_back),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
             },
             actions = {
-                IconButton(
-                    onClick = {
-                        artistPage?.artist?.shareLink?.let { link ->
-                            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                            val clip = ClipData.newPlainText("Artist Link", link)
-                            clipboard.setPrimaryClip(clip)
-                            Toast.makeText(context, R.string.link_copied, Toast.LENGTH_SHORT).show()
-                        }
-                    },
+                Surface(
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    modifier = Modifier.padding(end = 8.dp)
                 ) {
-                    Icon(
-                        painterResource(R.drawable.link),
-                        contentDescription = null,
-                    )
+                    IconButton(
+                        onClick = {
+                            artistPage?.artist?.shareLink?.let { link ->
+                                val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                val clip = ClipData.newPlainText("Artist Link", link)
+                                clipboard.setPrimaryClip(clip)
+                                Toast.makeText(context, R.string.link_copied, Toast.LENGTH_SHORT).show()
+                            }
+                        },
+                    ) {
+                        Icon(
+                            painterResource(R.drawable.link),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
