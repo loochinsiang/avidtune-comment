@@ -112,3 +112,5 @@
 ## Keep Wire protobuf classes
 -keep class com.squareup.wire.** { *; }
 
+## Rules for Ktor
+-dontwarn java.lang.management.**
