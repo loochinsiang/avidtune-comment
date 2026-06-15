@@ -283,17 +283,6 @@ fun SettingsScreen(
     val listState = rememberLazyListState()
     val viewModel: HomeViewModel = hiltViewModel()
 
-    var showTogetherScreen by remember { mutableStateOf(false) }
-
-    if (showTogetherScreen) {
-        com.cgens67.avidtune.together.MusicTogetherScreen(
-            navController = navController,
-            scrollBehavior = scrollBehavior,
-            onBack = { showTogetherScreen = false }
-        )
-        return // Stop rendering SettingsScreen beneath it
-    }
-
     val newsViewModel: NewsViewModel = hiltViewModel()
     val hasUnreadNews by newsViewModel.hasUnreadNews.collectAsState()
 
@@ -313,6 +302,17 @@ fun SettingsScreen(
 
     var hasUpdate by remember { mutableStateOf(false) }
     var fetchedLatestVersion by remember { mutableStateOf(BuildConfig.VERSION_NAME) }
+
+    var showTogetherScreen by remember { mutableStateOf(false) }
+
+    if (showTogetherScreen) {
+        com.cgens67.avidtune.together.MusicTogetherScreen(
+            navController = navController,
+            scrollBehavior = scrollBehavior,
+            onBack = { showTogetherScreen = false }
+        )
+        return // Stop rendering SettingsScreen beneath it
+    }
 
     // Search History State
     val prefs = context.getSharedPreferences("settings_search_history", Context.MODE_PRIVATE)
@@ -421,7 +421,7 @@ fun SettingsScreen(
     }
 
     val quickActions = buildQuickActions(navController, resetSearch)
-    val integrationActions = buildIntegrationActions(navController, resetSearch, onShowTogether = { showTogetherScreen = true })
+    val integrationActions = buildIntegrationActions(navController, resetSearch) { showTogetherScreen = true }
     val settingsGroups = buildSettingsGroups(navController, resetSearch, onChangelogClick = { navController.navigate("settings/changelog") }, hasUnreadNews)
     val internalItems = buildInternalItems(navController, resetSearch)
 
@@ -750,14 +750,14 @@ private fun buildQuickActions(navController: NavController, resetSearch: () -> U
 private fun buildIntegrationActions(
     navController: NavController, 
     resetSearch: () -> Unit,
-    onShowTogether: () -> Unit
+    onTogetherClick: () -> Unit
 ): List<SettingsIntegrationAction> {
     val uriHandler = LocalUriHandler.current
     return listOf(
         SettingsIntegrationAction(
             icon = painterResource(R.drawable.multi_user),
             label = stringResource(R.string.music_together),
-            onClick = { resetSearch(); onShowTogether() },
+            onClick = { resetSearch(); onTogetherClick() },
             accentColor = Color(0xFF1DB954)
         ),
         SettingsIntegrationAction(
