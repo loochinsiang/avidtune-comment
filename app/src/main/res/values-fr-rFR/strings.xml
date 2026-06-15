@@ -900,6 +900,53 @@
     <string name="internal_settings">Paramètres internes</string>
     <string name="github">GitHub</string>
     <string name="new_badge">Nouveau</string>
+    
+    <string name="music_together">Écoute en groupe</string>
+    <string name="together_display_name">Nom d\'affichage</string>
+    <string name="together_display_name_placeholder">Entrez votre nom</string>
+    <string name="together_port">Port</string>
+    <string name="together_host_section">Héberger une session</string>
+    <string name="together_lan">Réseau local</string>
+    <string name="together_allow_guests_add">Autoriser les invités à ajouter des titres</string>
+    <string name="together_allow_guests_control">Autoriser les invités à contrôler la lecture</string>
+    <string name="together_require_approval">Exiger une approbation pour rejoindre</string>
+    <string name="together_join_section">Rejoindre une session</string>
+    <string name="together_join_link_hint">Collez le lien de la session ici</string>
+    <string name="together_kick">Expulser</string>
+    <string name="together_kick_confirm">Voulez-vous vraiment expulser %1$s ?</string>
+    <string name="together_ban">Bannir</string>
+    <string name="together_ban_confirm">Voulez-vous vraiment bannir %1$s ?</string>
+    <string name="together_status">Statut</string>
+    <string name="together_idle">Inactif</string>
+    <string name="together_hosting">Hébergement</string>
+    <string name="together_joining">Rejoindre…</string>
+    <string name="together_waiting_approval">En attente d\'approbation…</string>
+    <string name="together_connected">Connecté</string>
+    <string name="together_error_state">Erreur</string>
+    <string name="together_participants">Participants</string>
+    <string name="together_connected_count">%1$d connecté(s)</string>
+    <string name="together_role_host">Hôte</string>
+    <string name="together_role_guest">Invité</string>
+    <string name="together_pending_approval">En attente d\'approbation</string>
+    <string name="together_welcome_title">Bienvenue dans Écoute en groupe</string>
+    <string name="together_welcome_body">Écoutez de la musique en simultané avec vos amis sur le même réseau.</string>
+    <string name="together_welcome_host_title">Héberger</string>
+    <string name="together_welcome_host_body">Démarrez une session et partagez le lien avec vos amis.</string>
+    <string name="together_welcome_join_title">Rejoindre</string>
+    <string name="together_welcome_join_body">Collez un lien de session pour rejoindre un salon existant.</string>
+    <string name="together_welcome_permissions_title">Autorisations</string>
+    <string name="together_welcome_permissions_body">L\'hôte décide qui peut ajouter des chansons et mettre en pause.</string>
+    <string name="together_dont_show_again">Ne plus afficher</string>
+    <string name="start_session">Démarrer la session</string>
+    <string name="join_session">Rejoindre la session</string>
+    <string name="session_link">Lien de la session</string>
+    <string name="paste">Coller</string>
+    <string name="join">Rejoindre</string>
+    <string name="joined">Rejoint</string>
+    <string name="leave">Quitter</string>
+    <string name="connecting">Connexion…</string>
+    <string name="participants">Participants</string>
+    <string name="got_it">Compris</string>
 
 
 </resources>
