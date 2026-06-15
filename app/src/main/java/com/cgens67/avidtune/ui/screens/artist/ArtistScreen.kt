@@ -539,7 +539,7 @@ fun ArtistScreen(
 
                             // Description
                             var isDescriptionExpanded by rememberSaveable { mutableStateOf(false) }
-                            val fallbackDesc = "Explore the music of $artistName."
+                            val fallbackDesc = "$artistName is a music artist."
                             val description = artistPage?.description?.substringBefore("From Wikipedia")?.trim() ?: fallbackDesc
 
                             Text(
