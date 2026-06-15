@@ -136,6 +136,7 @@ import com.cgens67.avidtune.playback.queues.ListQueue
 import com.cgens67.avidtune.ui.theme.PlayerColorExtractor
 import com.cgens67.innertube.YouTube
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -174,6 +175,18 @@ fun ArtistScreen(
     // Get thumbnail URL
     val thumbnail = artistPage?.artist?.thumbnail ?: libraryArtist?.artist?.thumbnailUrl
     val artistName = artistPage?.artist?.title ?: libraryArtist?.artist?.name ?: stringResource(R.string.unknown)
+
+    // Skeleton loading state
+    var isFetching by remember { mutableStateOf(true) }
+    LaunchedEffect(artistPage) {
+        if (artistPage != null) {
+            isFetching = false
+        }
+    }
+    LaunchedEffect(Unit) {
+        delay(2500) // 2.5 seconds timeout for shimmer
+        isFetching = false
+    }
 
     // Extract gradient colors from artist image
     LaunchedEffect(thumbnail) {
@@ -348,7 +361,7 @@ fun ArtistScreen(
                 .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
                 .asPaddingValues(),
         ) {
-            if (artistPage == null && librarySongs.isEmpty()) {
+            if (isFetching && artistPage == null) {
                 item(key = "shimmer") {
                     ShimmerHost {
                         // Header Image
@@ -448,7 +461,7 @@ fun ArtistScreen(
                                 modifier = Modifier.padding(bottom = 16.dp)
                             )
 
-                            // Subscriber count badges
+                            // Subscriber count and Streams badges
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier
@@ -476,6 +489,54 @@ fun ArtistScreen(
                                             text = subscribers.split(" ").firstOrNull() ?: subscribers,
                                             style = MaterialTheme.typography.labelLarge,
                                             color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
+                                }
+
+                                artistPage?.artist?.monthlyListenerCountText?.let { monthlyListeners ->
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(12.dp))
+                                            .background(MaterialTheme.colorScheme.tertiaryContainer)
+                                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(R.drawable.play),
+                                            contentDescription = null,
+                                            modifier = Modifier.size(16.dp),
+                                            tint = MaterialTheme.colorScheme.onTertiaryContainer
+                                        )
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Text(
+                                            text = monthlyListeners.split(" ").firstOrNull() ?: monthlyListeners,
+                                            style = MaterialTheme.typography.labelLarge,
+                                            color = MaterialTheme.colorScheme.onTertiaryContainer,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
+                                }
+
+                                if (totalPlayCount > 0) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(12.dp))
+                                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(R.drawable.history),
+                                            contentDescription = null,
+                                            modifier = Modifier.size(16.dp),
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Text(
+                                            text = totalPlayCount.toString(),
+                                            style = MaterialTheme.typography.labelLarge,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                                             fontWeight = FontWeight.Medium
                                         )
                                     }
@@ -516,9 +577,7 @@ fun ArtistScreen(
                                 ToggleButton(
                                     checked = libraryArtist?.artist?.bookmarkedAt != null,
                                     onCheckedChange = {
-                                        val isBookmarked = libraryArtist?.artist?.bookmarkedAt != null
-                                        
-                                        // Save locally
+                                        val isSubscribing = libraryArtist?.artist?.bookmarkedAt == null
                                         database.transaction {
                                             val artist = libraryArtist?.artist
                                             if (artist != null) {
@@ -537,18 +596,21 @@ fun ArtistScreen(
                                             }
                                         }
 
-                                        // Network sync
                                         coroutineScope.launch(Dispatchers.IO) {
                                             try {
-                                                val targetChannelId = artistPage?.artist?.channelId 
-                                                    ?: if (viewModel.artistId.startsWith("UC")) viewModel.artistId 
-                                                    else YouTube.artist(viewModel.artistId).getOrNull()?.artist?.channelId
-                                                
-                                                if (targetChannelId != null) {
-                                                    YouTube.subscribeChannel(targetChannelId, !isBookmarked)
+                                                val artistId = artistPage?.artist?.id ?: libraryArtist?.artist?.id ?: return@launch
+                                                val channelId = artistPage?.artist?.channelId ?: libraryArtist?.artist?.channelId
+                                                val targetChannelId = channelId ?: YouTube.getChannelId(artistId)
+
+                                                if (targetChannelId.isNotEmpty()) {
+                                                    if (isSubscribing) {
+                                                        YouTube.subscribeChannel(targetChannelId, true)
+                                                    } else {
+                                                        YouTube.unsubscribeChannel(targetChannelId, true)
+                                                    }
                                                 }
                                             } catch (e: Exception) {
-                                                Log.e("ArtistScreen", "Failed to subscribe/unsubscribe", e)
+                                                e.printStackTrace()
                                             }
                                         }
                                     },
