@@ -347,7 +347,7 @@ fun ArtistScreen(
                 .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
                 .asPaddingValues(),
         ) {
-            if (artistPage == null && librarySongs.isEmpty()) {
+            if (artistPage == null) {
                 item(key = "shimmer") {
                     ShimmerHost {
                         // Header Image
@@ -955,7 +955,7 @@ fun ArtistScreen(
         TopAppBar(
             title = {
                 if (!transparentAppBar)
-                    Text(artistPage?.artist?.title.orEmpty())
+                    Text(artistName)
             },
             navigationIcon = {
                 com.cgens67.avidtune.ui.component.IconButton(
@@ -985,11 +985,10 @@ fun ArtistScreen(
                     )
                 }
             },
-            colors = if (transparentAppBar) {
-                TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
-            } else {
-                TopAppBarDefaults.topAppBarColors()
-            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = Color.Transparent,
+                scrolledContainerColor = MaterialTheme.colorScheme.surface
+            ),
             scrollBehavior = scrollBehavior
         )
     }
