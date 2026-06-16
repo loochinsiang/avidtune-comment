@@ -168,15 +168,19 @@ class TogetherManager(val scope: CoroutineScope, val player: ExoPlayer) {
     // IMPORTANT: Call this ONLY from the Main thread because ExoPlayer is accessed here
     private fun getCurrentRoomState(sId: String): TogetherRoomState {
         val currentItem = player.currentMediaItem
+        val customMeta = currentItem?.localConfiguration?.tag as? com.cgens67.avidtune.models.MediaMetadata
+        
         val trackId = currentItem?.mediaId ?: ""
-        val trackTitle = currentItem?.mediaMetadata?.title?.toString() ?: ""
-        val trackArtist = currentItem?.mediaMetadata?.artist?.toString() ?: ""
-        val trackArt = currentItem?.mediaMetadata?.artworkUri?.toString()
+        val trackTitle = customMeta?.title ?: currentItem?.mediaMetadata?.title?.toString() ?: ""
+        val trackArtists = customMeta?.artists?.map { it.name } ?: listOf(currentItem?.mediaMetadata?.artist?.toString() ?: "")
+        val trackArt = customMeta?.thumbnailUrl ?: currentItem?.mediaMetadata?.artworkUri?.toString()
+        val durationSec = customMeta?.duration ?: -1
 
         val currentTrack = TogetherTrack(
             id = trackId,
             title = trackTitle,
-            artists = listOf(trackArtist),
+            artists = trackArtists,
+            durationSec = durationSec,
             thumbnailUrl = trackArt
         )
 
@@ -407,15 +411,28 @@ class TogetherManager(val scope: CoroutineScope, val player: ExoPlayer) {
 
         val myTrackId = player.currentMediaItem?.mediaId
         if (myTrackId != currentTrack.id && currentTrack.id.isNotEmpty()) {
+            val customMetadata = com.cgens67.avidtune.models.MediaMetadata(
+                id = currentTrack.id,
+                title = currentTrack.title,
+                artists = currentTrack.artists.map { com.cgens67.avidtune.models.MediaMetadata.Artist(id = null, name = it) },
+                duration = currentTrack.durationSec,
+                thumbnailUrl = currentTrack.thumbnailUrl,
+                album = null,
+                explicit = false,
+                liked = false
+            )
+            
             val mediaItem = MediaItem.Builder()
                 .setMediaId(currentTrack.id)
                 .setUri(currentTrack.id)
                 .setCustomCacheKey(currentTrack.id)
+                .setTag(customMetadata)
                 .setMediaMetadata(
                     androidx.media3.common.MediaMetadata.Builder()
                         .setTitle(currentTrack.title)
-                        .setArtist(currentTrack.artists.joinToString())
+                        .setArtist(currentTrack.artists.joinToString(", "))
                         .setArtworkUri(currentTrack.thumbnailUrl?.let { android.net.Uri.parse(it) })
+                        .setMediaType(androidx.media3.common.MediaMetadata.MEDIA_TYPE_MUSIC)
                         .build()
                 )
                 .build()
@@ -618,14 +635,16 @@ fun MusicTogetherScreen(
 
     AnimatedVisibility(
         visible = isVisible,
-        enter = slideInVertically(
-            initialOffsetY = { it },
-            animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
-        ) + fadeIn(tween(300)),
-        exit = slideOutVertically(
-            targetOffsetY = { it },
-            animationSpec = tween(300)
-        ) + fadeOut(tween(300)),
+        enter = fadeIn(spring(dampingRatio = Spring.DampingRatioMediumBouncy)) +
+                slideInHorizontally(
+                    initialOffsetX = { it },
+                    animationSpec = spring(stiffness = Spring.StiffnessLow)
+                ),
+        exit = fadeOut(spring(dampingRatio = Spring.DampingRatioLowBouncy)) +
+                slideOutHorizontally(
+                    targetOffsetX = { it },
+                    animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
+                ),
         modifier = Modifier.fillMaxSize().zIndex(100f)
     ) {
         Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface)) {
