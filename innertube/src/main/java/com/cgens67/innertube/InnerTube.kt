@@ -210,6 +210,25 @@ class InnerTube {
         )
     }
 
+    suspend fun getComments(
+        client: YouTubeClient,
+        videoId: String?,
+        continuation: String?
+    ) = httpClient.post("next") {
+        ytClient(client, setLogin = useLoginForBrowse)
+        setBody(
+            NextBody(
+                context = client.toContext(locale, visitorData, dataSyncId),
+                videoId = videoId,
+                playlistId = null,
+                playlistSetVideoId = null,
+                index = null,
+                params = null,
+                continuation = continuation
+            )
+        )
+    }
+
     suspend fun getSearchSuggestions(
         client: YouTubeClient,
         input: String,
@@ -466,7 +485,4 @@ class InnerTube {
         httpClient.get("https://returnyoutubedislikeapi.com/Votes?videoId=$videoId") {
             contentType(ContentType.Application.Json)
         }
-
-
-
 }
