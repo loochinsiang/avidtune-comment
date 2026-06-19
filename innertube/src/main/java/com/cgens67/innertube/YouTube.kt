@@ -30,6 +30,8 @@ import com.cgens67.innertube.models.response.GetTranscriptResponse
 import com.cgens67.innertube.models.response.NextResponse
 import com.cgens67.innertube.models.response.PlayerResponse
 import com.cgens67.innertube.models.response.SearchResponse
+import com.cgens67.innertube.models.response.GetCommentsResponse
+import com.cgens67.innertube.models.response.CommentRenderer
 import com.cgens67.innertube.pages.AlbumPage
 import com.cgens67.innertube.pages.ArtistItemsContinuationPage
 import com.cgens67.innertube.pages.ArtistItemsPage
@@ -791,11 +793,11 @@ object YouTube {
             endpoint.params,
             continuation).body<NextResponse>()
         val playlistPanelRenderer = response.continuationContents?.playlistPanelContinuation
-            ?: response.contents.singleColumnMusicWatchNextResultsRenderer.tabbedRenderer
-                .watchNextTabbedResultsRenderer.tabs[0].tabRenderer.content?.musicQueueRenderer
+            ?: response.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer
+                ?.watchNextTabbedResultsRenderer?.tabs?.getOrNull(0)?.tabRenderer?.content?.musicQueueRenderer
                 ?.content?.playlistPanelRenderer!!
-        val title = response.contents.singleColumnMusicWatchNextResultsRenderer.tabbedRenderer
-            .watchNextTabbedResultsRenderer.tabs[0].tabRenderer.content?.musicQueueRenderer
+        val title = response.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer
+            ?.watchNextTabbedResultsRenderer?.tabs?.getOrNull(0)?.tabRenderer?.content?.musicQueueRenderer
             ?.header?.musicQueueHeaderRenderer?.subtitle?.runs?.firstOrNull()?.text
         val items = playlistPanelRenderer.contents.mapNotNull { content ->
             content.playlistPanelVideoRenderer
@@ -811,8 +813,8 @@ object YouTube {
                 result.copy(
                     title = title,
                     items = songs + result.items,
-                    lyricsEndpoint = response.contents.singleColumnMusicWatchNextResultsRenderer.tabbedRenderer.watchNextTabbedResultsRenderer.tabs.getOrNull(1)?.tabRenderer?.endpoint?.browseEndpoint,
-                    relatedEndpoint = response.contents.singleColumnMusicWatchNextResultsRenderer.tabbedRenderer.watchNextTabbedResultsRenderer.tabs.getOrNull(2)?.tabRenderer?.endpoint?.browseEndpoint,
+                    lyricsEndpoint = response.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer?.watchNextTabbedResultsRenderer?.tabs?.getOrNull(1)?.tabRenderer?.endpoint?.browseEndpoint,
+                    relatedEndpoint = response.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer?.watchNextTabbedResultsRenderer?.tabs?.getOrNull(2)?.tabRenderer?.endpoint?.browseEndpoint,
                     currentIndex = currentIndex,
                     endpoint = watchPlaylistEndpoint
                 )
@@ -822,11 +824,37 @@ object YouTube {
             title = title,
             items = songs,
             currentIndex = currentIndex,
-            lyricsEndpoint = response.contents.singleColumnMusicWatchNextResultsRenderer.tabbedRenderer.watchNextTabbedResultsRenderer.tabs.getOrNull(1)?.tabRenderer?.endpoint?.browseEndpoint,
-            relatedEndpoint = response.contents.singleColumnMusicWatchNextResultsRenderer.tabbedRenderer.watchNextTabbedResultsRenderer.tabs.getOrNull(2)?.tabRenderer?.endpoint?.browseEndpoint,
+            lyricsEndpoint = response.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer?.watchNextTabbedResultsRenderer?.tabs?.getOrNull(1)?.tabRenderer?.endpoint?.browseEndpoint,
+            relatedEndpoint = response.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer?.watchNextTabbedResultsRenderer?.tabs?.getOrNull(2)?.tabRenderer?.endpoint?.browseEndpoint,
             continuation = playlistPanelRenderer.continuations?.getContinuation(),
             endpoint = endpoint
         )
+    }
+
+    suspend fun commentsInitial(videoId: String): Result<Pair<List<CommentRenderer>, String?>> = runCatching {
+        val response = innerTube.getComments(WEB_REMIX, videoId, null).body<GetCommentsResponse>()
+        val panel = response.engagementPanels?.find { 
+            it.engagementPanelSectionListRenderer?.panelIdentifier == "engagement-panel-comments-section" 
+        }
+        val token = panel?.engagementPanelSectionListRenderer?.content?.sectionListRenderer?.contents?.firstOrNull()?.itemSectionRenderer?.contents?.firstOrNull()?.continuationItemRenderer?.continuationEndpoint?.continuationCommand?.token
+        
+        if (token != null) {
+            commentsContinuation(token).getOrThrow()
+        } else {
+            emptyList<CommentRenderer>() to null
+        }
+    }
+
+    suspend fun commentsContinuation(continuation: String): Result<Pair<List<CommentRenderer>, String?>> = runCatching {
+        val response = innerTube.getComments(WEB_REMIX, null, continuation).body<GetCommentsResponse>()
+        val items = response.onResponseReceivedEndpoints?.firstOrNull()?.appendContinuationItemsAction?.continuationItems 
+            ?: response.onResponseReceivedEndpoints?.firstOrNull()?.reloadContinuationItemsCommand?.continuationItems
+            ?: emptyList()
+        
+        val comments = items.mapNotNull { it.commentThreadRenderer?.comment?.commentRenderer }
+        val nextToken = items.firstNotNullOfOrNull { it.continuationItemRenderer?.continuationEndpoint?.continuationCommand?.token }
+        
+        comments to nextToken
     }
 
     suspend fun lyrics(endpoint: BrowseEndpoint): Result<String?> = runCatching {
