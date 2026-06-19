@@ -31,6 +31,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.Message
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Button
@@ -115,6 +117,7 @@ fun ColumnScope.PlayerMenu(
     playerBottomSheetState: BottomSheetState,
     isQueueTrigger: Boolean? = false,
     onShowDetailsDialog: () -> Unit,
+    onShowCommentsDialog: () -> Unit = {},
     onDismiss: () -> Unit,
 ) {
     mediaMetadata ?: return
@@ -766,6 +769,24 @@ fun ColumnScope.PlayerMenu(
                             },
                             onClick = {
                                 onShowDetailsDialog()
+                                onDismiss()
+                            }
+                        )
+                    )
+
+                    add(
+                        MenuItemData(
+                            title = { Text(text = "Comments") }, // Will use hardcoded text since R.string.comments might not exist
+                            description = { Text(text = "View what others are saying") },
+                            icon = {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Rounded.Message,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            },
+                            onClick = {
+                                onShowCommentsDialog()
                                 onDismiss()
                             }
                         )
