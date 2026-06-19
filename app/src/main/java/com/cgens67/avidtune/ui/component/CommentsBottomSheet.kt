@@ -142,7 +142,7 @@ fun CommentsBottomSheet(
 fun CommentItem(comment: CommentRenderer) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        crossAxisAlignment = CrossAxisAlignment.Start
+        verticalAlignment = Alignment.Top
     ) {
         AsyncImage(
             model = comment.authorThumbnail?.thumbnails?.lastOrNull()?.url,
