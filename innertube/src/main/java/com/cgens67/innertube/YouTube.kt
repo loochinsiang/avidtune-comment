@@ -31,7 +31,7 @@ import com.cgens67.innertube.models.response.NextResponse
 import com.cgens67.innertube.models.response.PlayerResponse
 import com.cgens67.innertube.models.response.SearchResponse
 import com.cgens67.innertube.models.response.GetCommentsResponse
-import com.cgens67.innertube.models.response.CommentRenderer
+import com.cgens67.innertube.models.response.CommentItemUi
 import com.cgens67.innertube.pages.AlbumPage
 import com.cgens67.innertube.pages.ArtistItemsContinuationPage
 import com.cgens67.innertube.pages.ArtistItemsPage
@@ -831,27 +831,62 @@ object YouTube {
         )
     }
 
-    suspend fun commentsInitial(videoId: String): Result<Pair<List<CommentRenderer>, String?>> = runCatching {
+    suspend fun commentsInitial(videoId: String): Result<Pair<List<CommentItemUi>, String?>> = runCatching {
         val response = innerTube.getComments(WEB, videoId, null).body<GetCommentsResponse>()
         val panel = response.engagementPanels?.find {
             it.engagementPanelSectionListRenderer?.panelIdentifier == "engagement-panel-comments-section"
         }
-        val token = panel?.engagementPanelSectionListRenderer?.content?.sectionListRenderer?.contents?.firstOrNull()?.itemSectionRenderer?.contents?.firstOrNull()?.continuationItemRenderer?.continuationEndpoint?.continuationCommand?.token
+        var token: String? = null
+        panel?.engagementPanelSectionListRenderer?.content?.sectionListRenderer?.contents?.forEach { content ->
+            if (token == null) {
+                token = content.continuationItemRenderer?.continuationEndpoint?.continuationCommand?.token
+            }
+            if (token == null) {
+                content.itemSectionRenderer?.contents?.forEach { item ->
+                    if (token == null) {
+                        token = item.continuationItemRenderer?.continuationEndpoint?.continuationCommand?.token
+                    }
+                }
+            }
+        }
 
         if (token != null) {
-            commentsContinuation(token).getOrThrow()
+            commentsContinuation(token!!).getOrThrow()
         } else {
-            emptyList<CommentRenderer>() to null
+            emptyList<CommentItemUi>() to null
         }
     }
 
-    suspend fun commentsContinuation(continuation: String): Result<Pair<List<CommentRenderer>, String?>> = runCatching {
+    suspend fun commentsContinuation(continuation: String): Result<Pair<List<CommentItemUi>, String?>> = runCatching {
         val response = innerTube.getComments(WEB, null, continuation).body<GetCommentsResponse>()
         val items = response.onResponseReceivedEndpoints?.firstOrNull()?.appendContinuationItemsAction?.continuationItems
             ?: response.onResponseReceivedEndpoints?.firstOrNull()?.reloadContinuationItemsCommand?.continuationItems
             ?: emptyList()
 
-        val comments = items.mapNotNull { it.commentThreadRenderer?.comment?.commentRenderer }
+        val comments = items.mapNotNull { item ->
+            val commentRenderer = item.commentThreadRenderer?.comment?.commentRenderer
+            val commentViewModel = item.commentThreadRenderer?.comment?.commentViewModel?.commentViewModel
+            
+            if (commentRenderer != null) {
+                CommentItemUi(
+                    authorName = commentRenderer.authorText?.runs?.joinToString("") { it.text } ?: "Unknown",
+                    authorThumbnailUrl = commentRenderer.authorThumbnail?.thumbnails?.lastOrNull()?.url,
+                    content = commentRenderer.contentText?.runs?.joinToString("") { it.text } ?: "",
+                    publishedTime = commentRenderer.publishedTimeText?.runs?.joinToString("") { it.text } ?: "",
+                    voteCount = commentRenderer.voteCount?.runs?.joinToString("") { it.text } ?: ""
+                )
+            } else if (commentViewModel != null) {
+                CommentItemUi(
+                    authorName = commentViewModel.authorName ?: "Unknown",
+                    authorThumbnailUrl = commentViewModel.avatar?.avatar?.image?.sources?.lastOrNull()?.url,
+                    content = commentViewModel.content?.contentAsText?.content ?: "",
+                    publishedTime = commentViewModel.publishedTimeText ?: "",
+                    voteCount = commentViewModel.voteCount?.voteCountAsText?.content ?: ""
+                )
+            } else {
+                null
+            }
+        }
         val nextToken = items.firstNotNullOfOrNull { it.continuationItemRenderer?.continuationEndpoint?.continuationCommand?.token }
 
         comments to nextToken
