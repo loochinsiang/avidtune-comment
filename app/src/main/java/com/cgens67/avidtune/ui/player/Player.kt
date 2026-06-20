@@ -473,7 +473,13 @@ fun BottomSheetPlayer(
             MiniPlayer(
                 position = position,
                 duration = duration,
-                modifier = Modifier.background(bottomSheetBackgroundColor)
+                modifier = Modifier
+                    .background(bottomSheetBackgroundColor)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = { state.expandSoft() }
+                    )
             )
         },
     ) {
