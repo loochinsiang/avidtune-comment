@@ -3,7 +3,7 @@ package com.cgens67.avidtune.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cgens67.innertube.YouTube
-import com.cgens67.innertube.models.response.CommentRenderer
+import com.cgens67.innertube.models.response.CommentItemUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CommentsViewModel @Inject constructor() : ViewModel() {
-    private val _comments = MutableStateFlow<List<CommentRenderer>>(emptyList())
+    private val _comments = MutableStateFlow<List<CommentItemUi>>(emptyList())
     val comments = _comments.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
