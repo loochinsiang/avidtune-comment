@@ -22,7 +22,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.cgens67.avidtune.R
 import com.cgens67.avidtune.viewmodels.CommentsViewModel
-import com.cgens67.innertube.models.response.CommentRenderer
+import com.cgens67.innertube.models.response.CommentItemUi
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -139,13 +139,13 @@ fun CommentsBottomSheet(
 }
 
 @Composable
-fun CommentItem(comment: CommentRenderer) {
+fun CommentItem(comment: CommentItemUi) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Top
     ) {
         AsyncImage(
-            model = comment.authorThumbnail?.thumbnails?.lastOrNull()?.url,
+            model = comment.authorThumbnailUrl,
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -162,13 +162,13 @@ fun CommentItem(comment: CommentRenderer) {
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    text = comment.authorText?.runs?.joinToString("") { it.text } ?: "Unknown",
+                    text = comment.authorName,
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(
-                    text = comment.publishedTimeText?.runs?.joinToString("") { it.text } ?: "",
+                    text = comment.publishedTime,
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                 )
@@ -177,12 +177,12 @@ fun CommentItem(comment: CommentRenderer) {
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
-                text = comment.contentText?.runs?.joinToString("") { it.text } ?: "",
+                text = comment.content,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface
             )
 
-            if (!comment.voteCount?.runs.isNullOrEmpty()) {
+            if (comment.voteCount.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
@@ -193,7 +193,7 @@ fun CommentItem(comment: CommentRenderer) {
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = comment.voteCount?.runs?.joinToString("") { it.text } ?: "",
+                        text = comment.voteCount,
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
