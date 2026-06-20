@@ -832,12 +832,12 @@ object YouTube {
     }
 
     suspend fun commentsInitial(videoId: String): Result<Pair<List<CommentRenderer>, String?>> = runCatching {
-        val response = innerTube.getComments(WEB_REMIX, videoId, null).body<GetCommentsResponse>()
-        val panel = response.engagementPanels?.find { 
-            it.engagementPanelSectionListRenderer?.panelIdentifier == "engagement-panel-comments-section" 
+        val response = innerTube.getComments(WEB, videoId, null).body<GetCommentsResponse>()
+        val panel = response.engagementPanels?.find {
+            it.engagementPanelSectionListRenderer?.panelIdentifier == "engagement-panel-comments-section"
         }
         val token = panel?.engagementPanelSectionListRenderer?.content?.sectionListRenderer?.contents?.firstOrNull()?.itemSectionRenderer?.contents?.firstOrNull()?.continuationItemRenderer?.continuationEndpoint?.continuationCommand?.token
-        
+
         if (token != null) {
             commentsContinuation(token).getOrThrow()
         } else {
@@ -846,14 +846,14 @@ object YouTube {
     }
 
     suspend fun commentsContinuation(continuation: String): Result<Pair<List<CommentRenderer>, String?>> = runCatching {
-        val response = innerTube.getComments(WEB_REMIX, null, continuation).body<GetCommentsResponse>()
-        val items = response.onResponseReceivedEndpoints?.firstOrNull()?.appendContinuationItemsAction?.continuationItems 
+        val response = innerTube.getComments(WEB, null, continuation).body<GetCommentsResponse>()
+        val items = response.onResponseReceivedEndpoints?.firstOrNull()?.appendContinuationItemsAction?.continuationItems
             ?: response.onResponseReceivedEndpoints?.firstOrNull()?.reloadContinuationItemsCommand?.continuationItems
             ?: emptyList()
-        
+
         val comments = items.mapNotNull { it.commentThreadRenderer?.comment?.commentRenderer }
         val nextToken = items.firstNotNullOfOrNull { it.continuationItemRenderer?.continuationEndpoint?.continuationCommand?.token }
-        
+
         comments to nextToken
     }
 
