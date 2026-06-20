@@ -328,7 +328,18 @@ fun BottomSheetPlayer(
         mutableStateOf(false)
     }
 
+    var commentsVideoId by rememberSaveable {
+        mutableStateOf<String?>(null)
+    }
+
     val currentFormat by playerConnection.currentFormat.collectAsState(initial = null)
+
+    if (commentsVideoId != null) {
+        com.cgens67.avidtune.ui.component.CommentsBottomSheet(
+            videoId = commentsVideoId!!,
+            onDismiss = { commentsVideoId = null }
+        )
+    }
 
     if (showDetailsDialog) {
         AlertDialog(
@@ -462,6 +473,7 @@ fun BottomSheetPlayer(
             MiniPlayer(
                 position = position,
                 duration = duration,
+                modifier = Modifier.background(bottomSheetBackgroundColor)
             )
         },
     ) {
@@ -523,6 +535,7 @@ fun BottomSheetPlayer(
                                                 navController = navController,
                                                 playerBottomSheetState = state,
                                                 onShowDetailsDialog = { showDetailsDialog = true },
+                                                onShowCommentsDialog = { commentsVideoId = it.id },
                                                 onDismiss = menuState::dismiss,
                                             )
                                         }
@@ -552,6 +565,7 @@ fun BottomSheetPlayer(
                                                 navController = navController,
                                                 playerBottomSheetState = state,
                                                 onShowDetailsDialog = { showDetailsDialog = true },
+                                                onShowCommentsDialog = { commentsVideoId = it.id },
                                                 onDismiss = menuState::dismiss,
                                             )
                                         }
@@ -682,6 +696,7 @@ fun BottomSheetPlayer(
                                                 navController = navController,
                                                 playerBottomSheetState = state,
                                                 onShowDetailsDialog = { showDetailsDialog = true },
+                                                onShowCommentsDialog = { commentsVideoId = it.id },
                                                 onDismiss = menuState::dismiss,
                                             )
                                         }
@@ -711,6 +726,7 @@ fun BottomSheetPlayer(
                                                 navController = navController,
                                                 playerBottomSheetState = state,
                                                 onShowDetailsDialog = { showDetailsDialog = true },
+                                                onShowCommentsDialog = { commentsVideoId = it.id },
                                                 onDismiss = menuState::dismiss,
                                             )
                                         }
